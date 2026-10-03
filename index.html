@@ -3,49 +3,417 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ironfield — pike, shot and winged hussars</title>
-<meta name="description" content="Ironfield is a mobile real-time strategy game of 17th-century warfare: build your town, raise pike and shot, and lead the charge.">
-<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<title>Ironfield: Pike & Shot RTS</title>
+<meta name="description" content="Real-time strategy of the 1600s for your phone. Build a town, raise pike and musket, and lead the winged hussars.">
+<meta property="og:title" content="Ironfield: Pike & Shot RTS">
+<meta property="og:description" content="Real-time battles of 1600–1700, made for a phone screen.">
+<meta property="og:image" content="https://ironfield.site/img/og.jpg">
+<meta property="og:url" content="https://ironfield.site/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1d0c0e">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#1d0c0e;--panel:#2e1418;--gold:#f2c14e;--text:#f6ead6;--soft:#d6c3a6}
+:root{
+  --bg:#1d0c0e; --bg2:#26100f; --panel:#331517; --panel2:#3f1a1c; --line:#5a2a2e;
+  --gold:#f2c14e; --gold2:#ffd977; --ink:#2a1606; --red:#c8323a; --green:#56b84a;
+  --text:#f6ead6; --soft:#d6c3a6; --mute:#a88f7a;
+  --r:18px; --max:1180px;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Barlow,system-ui,sans-serif;line-height:1.55}
-main{max-width:960px;margin:0 auto;padding:32px 16px 48px}
-.hero{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
-.hero img{width:220px;max-width:45%;filter:drop-shadow(0 10px 18px #000a)}
-h1{font-family:'Lilita One',sans-serif;font-size:56px;margin:0;color:var(--gold);letter-spacing:1px}
-.tag{font-size:20px;color:var(--soft);margin:4px 0 18px}
-.btn{display:inline-block;background:var(--gold);color:#2a1606;font-family:'Lilita One',sans-serif;font-size:20px;padding:12px 22px;border-radius:14px;text-decoration:none;border:3px solid #2a1606}
-section{background:var(--panel);border:2px solid #5a2a2e;border-radius:16px;padding:20px;margin-top:24px}
-h2{font-family:'Lilita One',sans-serif;color:var(--gold);margin:0 0 8px}
-ul{margin:0;padding-left:20px}
-footer{margin-top:32px;color:var(--soft);font-size:14px}
-footer a{color:var(--gold)}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Barlow,system-ui,sans-serif;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:var(--gold)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 16px}
+.display{font-family:'Lilita One',sans-serif;font-weight:400;letter-spacing:.5px}
+
+/* nav */
+nav{position:fixed;inset:0 0 auto;z-index:20;transition:background .25s,box-shadow .25s}
+nav.solid{background:rgba(29,12,14,.92);backdrop-filter:blur(8px);box-shadow:0 1px 0 var(--line)}
+nav .wrap{display:flex;align-items:center;gap:20px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--gold);font-family:'Lilita One';font-size:22px}
+.brand img{width:36px;height:36px;border-radius:9px;border:2px solid var(--ink)}
+nav .links{display:flex;gap:22px;margin-left:auto}
+nav .links a{color:var(--soft);text-decoration:none;font-weight:600}
+nav .links a:hover{color:var(--gold)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:'Lilita One';font-size:20px;text-decoration:none;
+  padding:12px 22px;border-radius:14px;border:3px solid var(--ink);color:var(--ink);background:var(--gold);
+  box-shadow:0 5px 0 var(--ink),0 10px 24px #0006;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--ink),0 14px 28px #0007}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--soft);box-shadow:none}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold)}
+.play{background:#111;color:#fff;border-color:#000;font-family:Barlow;font-weight:700;font-size:15px;line-height:1.1;padding:10px 20px 10px 16px}
+.play svg{width:28px;height:28px}
+.play small{display:block;font-size:11px;font-weight:500;opacity:.8;letter-spacing:.5px;text-transform:uppercase}
+.play b{font-size:19px}
+
+/* hero */
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:96px 0 120px;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;background:url(img/hero-bg.jpg) center/cover;filter:saturate(1.1)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(60% 70% at 72% 55%,transparent 0,#1d0c0e99 60%,#1d0c0e 100%),
+             linear-gradient(90deg,#1d0c0ef2 0,#1d0c0ec0 42%,#1d0c0e33 70%,#1d0c0e88 100%),
+             linear-gradient(0deg,var(--bg) 0,transparent 30%)}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:24px;width:100%}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;background:#0006;border:1px solid var(--line);border-radius:99px;padding:6px 14px;
+  font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold2)}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+h1{font-family:'Lilita One';font-weight:400;font-size:clamp(64px,11vw,132px);line-height:.9;margin:18px 0 10px;color:var(--gold);
+  text-shadow:0 4px 0 var(--ink),0 8px 0 #0005,0 0 40px #f2c14e33;-webkit-text-stroke:2px var(--ink);letter-spacing:1px}
+.lede{font-size:clamp(18px,2.2vw,22px);color:var(--text);max-width:540px;margin:0 0 28px}
+.lede b{color:var(--gold2);font-weight:700}
+.ctas{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.hero-art{position:relative;justify-self:center}
+.hero-art::before{content:"";position:absolute;left:50%;bottom:4%;width:90%;aspect-ratio:3/1;transform:translateX(-50%);
+  background:radial-gradient(closest-side,#000a,transparent);z-index:-1}
+.hero-art img{height:min(66vh,600px);width:auto;max-width:42vw;filter:drop-shadow(0 20px 30px #000a);animation:bob 5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px)}}
+.facts{position:absolute;left:0;right:0;bottom:28px}
+.facts .wrap{display:flex;flex-wrap:wrap;gap:10px}
+.pill{background:#0008;border:1px solid var(--line);border-radius:99px;padding:8px 16px;font-weight:600;font-size:14px;color:var(--soft);backdrop-filter:blur(4px)}
+.pill b{color:var(--gold);font-weight:700}
+
+/* sections */
+section{padding:96px 0}
+.kicker{color:var(--gold);font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:13px}
+h2{font-family:'Lilita One';font-weight:400;font-size:clamp(34px,5vw,54px);line-height:1.05;margin:8px 0 14px}
+.sub{color:var(--soft);font-size:18px;max-width:640px;margin:0}
+.head{margin-bottom:40px}
+
+/* modes */
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.mode{background:var(--panel);border:2px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;
+  transition:transform .2s,border-color .2s}
+.mode:hover{transform:translateY(-4px);border-color:var(--gold)}
+.mode .shot{aspect-ratio:16/10;background:center/cover}
+.mode .body{padding:16px 18px 20px}
+.mode h3{font-family:'Lilita One';font-weight:400;font-size:26px;margin:0 0 2px;color:var(--gold)}
+.mode .time{font-size:13px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:1px}
+.mode p{margin:8px 0 0;color:var(--soft);font-size:15px}
+
+/* feature rows */
+.row{display:grid;grid-template-columns:1.25fr 1fr;gap:48px;align-items:center;margin-top:80px}
+.row.flip{grid-template-columns:1fr 1.25fr}
+.row.flip .media{order:2}
+.media{position:relative}
+.frame{border-radius:22px;padding:8px;background:#0b0405;border:2px solid var(--line);box-shadow:0 30px 60px #000a}
+.frame img{border-radius:15px;width:100%}
+.media .tag{position:absolute;left:-10px;top:22px;background:var(--red);color:#fff;font-family:'Lilita One';font-size:18px;padding:6px 14px;border-radius:10px;border:3px solid var(--ink);transform:rotate(-4deg)}
+.ticks{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:12px}
+.ticks li{position:relative;padding-left:34px;color:var(--soft)}
+.ticks li b{color:var(--text)}
+.ticks li::before{content:"";position:absolute;left:0;top:3px;width:22px;height:22px;border-radius:7px;background:var(--gold);border:2px solid var(--ink);
+  -webkit-mask:none}
+.ticks li::after{content:"";position:absolute;left:7px;top:7px;width:6px;height:10px;border:solid var(--ink);border-width:0 3px 3px 0;transform:rotate(45deg)}
+
+/* powers */
+.powers-bg{background:linear-gradient(180deg,var(--bg) 0,var(--bg2) 20%,var(--bg2) 80%,var(--bg) 100%)}
+.powers{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.power{position:relative;background:linear-gradient(180deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:var(--r);
+  padding:18px 18px 22px;text-align:center;overflow:hidden}
+.power .flag{height:8px;border-radius:4px;margin:0 auto 14px;width:60px}
+.power .fig{height:200px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:12px;position:relative}
+.power .fig::after{content:"";position:absolute;bottom:-6px;width:70%;height:22px;border-radius:50%;background:radial-gradient(closest-side,#000a,transparent);z-index:0}
+.power .fig img{max-height:200px;width:auto;position:relative;z-index:1;transition:transform .25s}
+.power:hover .fig img{transform:scale(1.06) translateY(-4px)}
+.power h3{font-family:'Lilita One';font-weight:400;font-size:24px;margin:0;color:var(--gold)}
+.power .troops{font-size:13px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.power p{color:var(--soft);font-size:15px;margin:10px 0 0}
+
+/* generals parade */
+.parade{margin-top:64px;position:relative;padding:0 0 18px}
+.parade .line{display:flex;justify-content:center;align-items:flex-end;gap:0;overflow:hidden}
+.parade img{height:150px;width:auto;margin:0 -10px;filter:drop-shadow(0 10px 8px #0008);transition:transform .25s}
+.parade img:hover{transform:translateY(-8px) scale(1.05)}
+.parade::after{content:"";display:block;height:3px;margin:0 auto;max-width:900px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
+.parade-cap{text-align:center;color:var(--mute);font-size:14px;margin-top:14px}
+
+/* duo cards */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:var(--r);padding:28px}
+.card h3{font-family:'Lilita One';font-weight:400;font-size:30px;margin:0 0 6px;color:var(--gold)}
+.card p{color:var(--soft);margin:0}
+.card .ticks{margin-top:14px}
+.icon{width:56px;height:56px;border-radius:16px;background:var(--gold);border:3px solid var(--ink);display:grid;place-items:center;margin-bottom:16px;box-shadow:0 4px 0 var(--ink)}
+.icon svg{width:30px;height:30px;stroke:var(--ink);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* gallery */
+.gallery{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 16px 22px;margin:0 -16px;scrollbar-color:var(--line) transparent}
+.gallery button{flex:0 0 min(78vw,560px);scroll-snap-align:center;padding:0;border:2px solid var(--line);border-radius:16px;overflow:hidden;cursor:zoom-in;background:#000;transition:border-color .2s}
+.gallery button:hover{border-color:var(--gold)}
+.gallery img{width:100%;aspect-ratio:2/1;object-fit:cover}
+dialog{border:0;padding:0;background:transparent;max-width:min(96vw,1440px)}
+dialog::backdrop{background:#000d}
+dialog img{border-radius:12px;max-height:88vh;width:auto}
+dialog form{position:absolute;top:8px;right:8px}
+dialog button{font:700 22px Barlow;width:42px;height:42px;border-radius:50%;border:0;background:#000a;color:#fff;cursor:pointer}
+
+/* cta band */
+.band{position:relative;border-radius:28px;overflow:hidden;padding:56px 40px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;
+  background:linear-gradient(90deg,#1d0c0ef0,#1d0c0eb0),url(img/s-fight_60.jpg) center/cover;border:2px solid var(--line)}
+.band h2{margin:0}
+.band p{color:var(--soft);margin:6px 0 0;font-size:18px}
+
+footer{padding:40px 0 56px;color:var(--mute);font-size:14px;border-top:1px solid #3a1a1c;margin-top:96px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center}
+footer a{color:var(--soft);text-decoration:none}
+footer a:hover{color:var(--gold)}
+footer .right{margin-left:auto}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+.reveal.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.hero-art img{animation:none}html{scroll-behavior:auto}}
+
+@media (max-width:960px){
+  .modes,.powers{grid-template-columns:1fr 1fr}
+  .row,.row.flip{grid-template-columns:1fr;gap:28px;margin-top:64px}
+  .row.flip .media{order:0}
+  nav .links{display:none}
+}
+@media (max-width:760px){
+  .hero{padding:84px 0 40px;min-height:auto;flex-direction:column;align-items:stretch}
+  .facts{position:static;margin-top:28px}
+  .hero .wrap{grid-template-columns:1fr}
+  .hero-art{order:-1;margin-bottom:-10px}
+  .hero-art img{height:auto;width:min(170px,45vw);max-width:none}
+  .hero::after{background:linear-gradient(180deg,#1d0c0e99 0,#1d0c0ee6 45%,var(--bg) 100%)}
+  h1{margin-top:12px}
+  .duo,.band{grid-template-columns:1fr}
+  .band{padding:36px 22px}
+  section{padding:72px 0}
+  .parade img{height:96px;margin:0 -8px}
+  .media .tag{left:6px}
+}
+@media (max-width:480px){
+  .modes,.powers{grid-template-columns:1fr}
+  .power .fig{height:170px}.power .fig img{max-height:170px}
+  .parade img:nth-child(n+6){display:none}
+  nav .btn{display:none}
+}
 </style>
 </head>
 <body>
-<main>
-<div class="hero">
-<img src="hussar.png" alt="A Polish winged hussar">
-<div>
-<h1>IRONFIELD</h1>
-<p class="tag">Pike, shot and winged hussars. Real-time strategy of the 1600s, built for your phone.</p>
-<span class="btn">Coming soon to Google Play</span>
-</div>
-</div>
-<section>
-<h2>The game</h2>
-<ul>
-<li>Skirmish: build a town, feed it, mine iron and gold, raise regiments and break the enemy.</li>
-<li>Battles of pike and musket, cannon and cavalry: volleys by rank, charges that strike home, morale that breaks.</li>
-<li>A campaign across Poland-Lithuania, Sweden, Muscovy and the Ottoman Empire.</li>
-<li>Build your army from every nation, hire black-clad mercenaries, raise your own general.</li>
-<li>Play a friend on the same Wi-Fi.</li>
-</ul>
+
+<nav id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="img/icon.png" alt="">IRONFIELD</a>
+    <div class="links">
+      <a href="#modes">Modes</a>
+      <a href="#war">The fighting</a>
+      <a href="#powers">Powers</a>
+      <a href="#gallery">Gallery</a>
+    </div>
+    <a class="btn" href="#join" style="font-size:16px;padding:8px 16px">Join the test</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow"><i></i>Android · closed test now</span>
+      <h1>IRONFIELD</h1>
+      <p class="lede">Pike, shot and <b>winged hussars</b>. A real-time strategy game of 1600–1700, built for your phone. Raise a town, form your regiments, and break the enemy line.</p>
+      <div class="ctas">
+        <a class="btn play" href="#join" aria-label="Coming soon on Google Play">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#34a853" d="M3.6 1.8 13.4 12 3.6 22.2c-.4-.2-.6-.6-.6-1.1V2.9c0-.5.2-.9.6-1.1z"/><path fill="#fbbc04" d="M16.7 15.3 13.4 12l3.3-3.3 3.9 2.2c.9.5.9 1.7 0 2.2z"/><path fill="#4285f4" d="M16.7 8.7 13.4 12 3.6 1.8c.3-.2.8-.2 1.2 0z"/><path fill="#ea4335" d="M16.7 15.3 4.8 22.2c-.4.2-.9.2-1.2 0L13.4 12z"/></svg>
+          <span><small>Coming soon on</small><b>Google Play</b></span>
+        </a>
+        <a class="btn ghost" href="#gallery">See it fight</a>
+      </div>
+    </div>
+    <div class="hero-art"><img src="img/hero-hussar.png" alt="A Polish winged hussar on an armoured horse" ></div>
+  </div>
+  <div class="facts"><div class="wrap">
+    <span class="pill"><b>4</b> powers</span>
+    <span class="pill"><b>3</b> historical battles</span>
+    <span class="pill"><b>15–20 min</b> skirmishes</span>
+    <span class="pill">Play a friend on <b>Wi-Fi</b></span>
+    <span class="pill"><b>No</b> in-app purchases</span>
+  </div></div>
+</header>
+
+<section id="modes">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="kicker">Four ways to fight</div>
+      <h2>A whole war in your pocket</h2>
+      <p class="sub">A long game or a short one: run a town for twenty minutes, or put two armies on a field and settle it in five.</p>
+    </div>
+    <div class="modes">
+      <article class="mode reveal"><div class="shot" style="background-image:url(img/p-town.jpg)"></div><div class="body">
+        <span class="time">15–20 min</span><h3>Skirmish</h3>
+        <p>Start with a Keep and a few serfs. Farm, fell, quarry and mine, raise regiments, then march on the enemy.</p></div></article>
+      <article class="mode reveal"><div class="shot" style="background-image:url(img/s-battle_deploy.jpg)"></div><div class="body">
+        <span class="time">3–5 min</span><h3>Battle</h3>
+        <p>No economy. Build an army within a budget, draw your lines with one finger, and fight.</p></div></article>
+      <article class="mode reveal"><div class="shot" style="background-image:url(img/p-camp.jpg)"></div><div class="body">
+        <span class="time">Turn by turn</span><h3>Campaign</h3>
+        <p>Lead your nation across the map. Lay sieges, make and break alliances, while the other powers fight their own wars.</p></div></article>
+      <article class="mode reveal"><div class="shot" style="background-image:url(img/s-fight_30.jpg)"></div><div class="body">
+        <span class="time">Real battles</span><h3>Historical</h3>
+        <p>Kircholm 1605, Klushino 1610 and Vienna 1683, with the armies that fought them.</p></div></article>
+    </div>
+  </div>
 </section>
+
+<section id="war" style="padding-top:0">
+  <div class="wrap">
+    <div class="row">
+      <div class="media reveal"><span class="tag">Volley!</span><div class="frame"><img src="img/s-fight_30.jpg" alt="Pike and musket regiments clash in the smoke" loading="lazy"></div></div>
+      <div class="reveal">
+        <div class="kicker">Fight the way they fought</div>
+        <h2>Regiments, not units</h2>
+        <p class="sub">Men march and fight as formed bodies. Get the drill right and the line holds. Get it wrong and it runs.</p>
+        <ul class="ticks">
+          <li><b>Lines, columns and squares,</b> with officers, drummers and colours.</li>
+          <li><b>Musketeers fire by ranks</b> and reload. Pikes stand against horse.</li>
+          <li><b>Morale matters.</b> Men waver, run and rally. When the flag goes down, the regiment is broken.</li>
+          <li><b>The charge.</b> Hit a line in the flank with hussars and watch it fold.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row flip">
+      <div class="media reveal"><div class="frame"><img src="img/p-gens.jpg" alt="The generals screen with John III Sobieski" loading="lazy"></div></div>
+      <div class="reveal">
+        <div class="kicker">Your collection</div>
+        <h2>Generals with a reputation</h2>
+        <p class="sub">Every general brings his own ability to the field, from steadier pikes to a fiercer charge.</p>
+        <ul class="ticks">
+          <li><b>Recruit legends:</b> Sobieski, Żółkiewski, Gustavus Adolphus, Kara Mustafa and more.</li>
+          <li><b>Raise your own commander:</b> hat, hair, armour, weapon, horse and coat.</li>
+          <li><b>Level your troop cards</b> and work through the battle pass, daily missions and a quest chain.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="parade reveal">
+      <div class="line">
+        <img src="img/g-zolkiewski.png" alt="Żółkiewski" loading="lazy">
+        <img src="img/g-gustavus.png" alt="Gustavus Adolphus" loading="lazy">
+        <img src="img/g-shuisky.png" alt="Shuisky" loading="lazy">
+        <img src="img/g-sobieski.png" alt="John III Sobieski" loading="lazy">
+        <img src="img/g-mustafa.png" alt="Kara Mustafa" loading="lazy">
+        <img src="img/g-khmelnytsky.png" alt="Khmelnytsky" loading="lazy">
+        <img src="img/g-peter.png" alt="Peter the Great" loading="lazy">
+        <img src="img/g-napoleon.png" alt="Napoleon" loading="lazy">
+      </div>
+      <p class="parade-cap">Some of the generals waiting for your command</p>
+    </div>
+  </div>
+</section>
+
+<section id="powers" class="powers-bg">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="kicker">Four powers</div>
+      <h2>Each army fights its own way</h2>
+      <p class="sub">Every nation has its own troops, its own strengths and its own road to victory.</p>
+    </div>
+    <div class="powers">
+      <article class="power reveal"><div class="flag" style="background:linear-gradient(#fff 50%,#dc143c 50%)"></div>
+        <div class="fig"><img src="img/g-sobieski.png" alt="Polish general on a barded horse" loading="lazy"></div>
+        <h3>Poland-Lithuania</h3><div class="troops">Winged hussars</div>
+        <p>The finest heavy horse in Europe. Win with the charge.</p></article>
+      <article class="power reveal"><div class="flag" style="background:linear-gradient(#006aa7 0 40%,#fecc00 40% 60%,#006aa7 60%)"></div>
+        <div class="fig"><img src="img/g-gustavus.png" alt="Swedish king on horseback" loading="lazy"></div>
+        <h3>Sweden</h3><div class="troops">Drilled shot</div>
+        <p>Drilled salvoes and light regimental guns that keep up with the line.</p></article>
+      <article class="power reveal"><div class="flag" style="background:#3d7a45"></div>
+        <div class="fig"><img src="img/u-streltsy.png" alt="A Muscovite strelets with musket" loading="lazy"></div>
+        <h3>Muscovy</h3><div class="troops">Streltsy</div>
+        <p>Many and cheap: streltsy with the berdysh axe, and masses of foot.</p></article>
+      <article class="power reveal"><div class="flag" style="background:#e30a17"></div>
+        <div class="fig"><img src="img/u-janissary.png" alt="An Ottoman janissary" loading="lazy"></div>
+        <h3>Ottoman Empire</h3><div class="troops">Janissaries · sipahis</div>
+        <p>The Sultan's standing infantry, swift sipahi horse and the heaviest guns.</p></article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="duo">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14.5 14.5 0 0 1 20 0"/><circle cx="12" cy="19.5" r="1"/></svg></div>
+        <h3>Play a friend</h3>
+        <p>Two phones on the same Wi-Fi. One hosts, the other joins, in Skirmish or Battle.</p>
+        <ul class="ticks">
+          <li><b>Fair:</b> card levels and saved generals don't count. Same rules for both.</li>
+          <li><b>No account, no chat.</b> Just the two of you and the field.</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M9 12h6M9 16h4M9 8h3"/></svg></div>
+        <h3>Made for touch</h3>
+        <p>One finger pans. A tap gives an order. Press and drag to draw a battle line.</p>
+        <ul class="ticks">
+          <li><b>Army bar:</b> every regiment one tap away.</li>
+          <li><b>A five-minute lesson</b> teaches a skirmish step by step.</li>
+          <li><b>Works offline.</b> Three graphics levels for older phones and big tablets.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" style="padding-top:0">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="kicker">Gallery</div>
+      <h2>Straight from the game</h2>
+      <p class="sub">Real screens from a phone. Tap one to see it full size.</p>
+    </div>
+    <div class="gallery" id="gal">
+      <button><img src="img/s-fight_30.jpg" alt="Melee in the smoke" loading="lazy"></button>
+      <button><img src="img/p-town.jpg" alt="A Skirmish town with its Keep, farms and mines" loading="lazy"></button>
+      <button><img src="img/p-camp.jpg" alt="The campaign map of Eastern Europe" loading="lazy"></button>
+      <button><img src="img/s-battle_deploy.jpg" alt="Deploying the army in squares and lines" loading="lazy"></button>
+      <button><img src="img/p-home.jpg" alt="The home screen with the hussar" loading="lazy"></button>
+      <button><img src="img/s-army.jpg" alt="The army cards" loading="lazy"></button>
+      <button><img src="img/p-creator.jpg" alt="Building your own general" loading="lazy"></button>
+      <button><img src="img/p-lesson9.jpg" alt="The Learn to play lesson" loading="lazy"></button>
+      <button><img src="img/s-fight_60.jpg" alt="A line breaks" loading="lazy"></button>
+    </div>
+  </div>
+</section>
+
+<section id="join" style="padding-top:0">
+  <div class="wrap">
+    <div class="band reveal">
+      <div>
+        <h2>Want to fight early?</h2>
+        <p>Ironfield is in a closed test on Google Play. Send us your Google Play email and we'll add you.</p>
+      </div>
+      <a class="btn" href="mailto:nikayroo@gmail.com?subject=Ironfield%20test">Join the test</a>
+    </div>
+  </div>
+</section>
+
 <footer>
-<a href="privacy/">Privacy policy</a> · Contact: <a href="mailto:nikayroo@gmail.com">nikayroo@gmail.com</a> · © 2026 Demch
+  <div class="wrap">
+    <a class="brand" href="#top" style="font-size:18px"><img src="img/icon.png" alt="" style="width:28px;height:28px">IRONFIELD</a>
+    <a href="privacy/">Privacy policy</a>
+    <a href="mailto:nikayroo@gmail.com">Contact</a>
+    <span class="right">© 2026 Demch</span>
+  </div>
 </footer>
-</main>
+
+<dialog id="lb"><img alt=""><form method="dialog"><button aria-label="Close">×</button></form></dialog>
+
+<script>
+const nav=document.getElementById('nav');
+const onScroll=()=>nav.classList.toggle('solid',scrollY>40);
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const lb=document.getElementById('lb'),lbi=lb.querySelector('img');
+document.getElementById('gal').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const i=b.querySelector('img');lbi.src=i.src;lbi.alt=i.alt;lb.showModal()});
+lb.addEventListener('click',e=>{if(e.target===lb)lb.close()});
+</script>
 </body>
 </html>
